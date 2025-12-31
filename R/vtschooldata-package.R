@@ -1,0 +1,52 @@
+#' vtschooldata: Fetch and Process Vermont School Data
+#'
+#' Downloads and processes school data from the Vermont Agency of Education (AOE).
+#' Provides functions for fetching enrollment data from the Vermont Education
+#' Dashboard (VED) and transforming it into tidy format for analysis.
+#'
+#' @section Main functions:
+#' \describe{
+#'   \item{\code{\link{fetch_enr}}}{Fetch enrollment data for a school year}
+#'   \item{\code{\link{fetch_enr_multi}}}{Fetch enrollment data for multiple years}
+#'   \item{\code{\link{tidy_enr}}}{Transform wide data to tidy (long) format}
+#'   \item{\code{\link{id_enr_aggs}}}{Add aggregation level flags}
+#'   \item{\code{\link{enr_grade_aggs}}}{Create grade-level aggregations}
+#'   \item{\code{\link{get_available_years}}}{Get available data years}
+#' }
+#'
+#' @section Cache functions:
+#' \describe{
+#'   \item{\code{\link{cache_status}}}{View cached data files}
+#'   \item{\code{\link{clear_cache}}}{Remove cached data files}
+#' }
+#'
+#' @section ID System:
+#' Vermont uses organization IDs (ORG_ID) that identify:
+#' \itemize{
+#'   \item Supervisory Unions (SU): Administrative units overseeing multiple school districts
+#'   \item School Districts (SD): Individual school districts
+#'   \item Schools: Individual school buildings
+#' }
+#' Vermont has approximately 60 supervisory unions/school districts and 300+ public schools.
+#'
+#' @section Data Sources:
+#' Data is sourced from the Vermont Agency of Education's Vermont Education Dashboard:
+#' \itemize{
+#'   \item VED Enrollment: \url{https://education.vermont.gov/data-and-reporting/vermont-education-dashboard/vermont-education-dashboard-enrollment}
+#'   \item Data Portal: \url{https://education.vermont.gov/data-and-reporting}
+#' }
+#'
+#' @section Data Characteristics:
+#' \itemize{
+#'   \item Enrollment is measured on October 1 of each school year
+#'   \item Data available from 2016-17 school year (end_year = 2017) to present
+#'   \item Includes PreK through Grade 12 and adult education
+#'   \item Kindergarten may be split into full-time and part-time counts
+#'   \item Small cell sizes (< 11 students) may be suppressed with "***"
+#' }
+#'
+#' @docType package
+#' @name vtschooldata-package
+#' @aliases vtschooldata
+#' @keywords internal
+"_PACKAGE"

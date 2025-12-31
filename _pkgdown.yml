@@ -1,0 +1,50 @@
+url: https://almartin82.github.io/vtschooldata/
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+home:
+  title: vtschooldata - Vermont School Enrollment Data
+  description: An R package for fetching and analyzing Vermont public school enrollment data from the Vermont Agency of Education.
+
+navbar:
+  structure:
+    left: [intro, reference, articles]
+    right: [search, github]
+  components:
+    articles:
+      text: Articles
+      menu:
+      - text: "---"
+      - text: "Tutorials"
+      - text: Getting Started
+        href: articles/quickstart.html
+      - text: Data Quality Analysis
+        href: articles/data-quality-qa.html
+
+reference:
+- title: Fetch Data
+  desc: Download enrollment data from Vermont AOE
+  contents:
+  - fetch_enr
+  - fetch_enr_multi
+  - get_available_years
+
+- title: Process & Tidy
+  desc: Transform data into analysis-ready formats
+  contents:
+  - tidy_enr
+  - id_enr_aggs
+  - enr_grade_aggs
+
+- title: Cache Management
+  desc: Manage locally cached data
+  contents:
+  - cache_status
+  - clear_cache
+
+footer:
+  structure:
+    left: developed_by
+    right: built_with
