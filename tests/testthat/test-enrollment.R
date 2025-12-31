@@ -24,13 +24,13 @@ test_that("get_available_years returns valid years", {
 
   expect_true(is.integer(years) || is.numeric(years))
   expect_true(length(years) > 0)
-  expect_true(min(years) >= 2017)  # VED data starts 2017
+  expect_true(min(years) >= 2004)  # VED data starts 2003-04 school year
   expect_true(max(years) <= 2030)  # Reasonable upper bound
 })
 
 
 test_that("fetch_enr validates year parameter", {
-  expect_error(fetch_enr(2010), "end_year must be between")
+  expect_error(fetch_enr(2003), "end_year must be between")  # Before 2004
   expect_error(fetch_enr(2030), "end_year must be between")
 })
 

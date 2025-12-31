@@ -45,43 +45,59 @@ process_enr <- function(raw_data, end_year) {
     stringsAsFactors = FALSE
   )
 
-  # Organization ID - Vermont uses ORG_ID
-  org_id_col <- find_col(c("ORG_ID", "ORGID", "ORGANIZATION_ID"))
-  if (!is.null(org_id_col)) {
-    result$org_id <- trimws(raw_data[[org_id_col]])
+  # Vermont VED structure:
+ # - SUPERVISORYUNIONIDENTIFIER: SU/SD ID (e.g., "SU001")
+  # - SUPERVISORYUNIONNAME: Name of SU/SD
+  # - SCHOOLIDENTIFIER: School ID (e.g., "PS023") - present for school-level rows
+  # - ORGANIZATIONNAME: Name of school (for school-level rows)
+
+  # Get SU/SD identifier (district level)
+  su_id_col <- find_col(c("SUPERVISORYUNIONIDENTIFIER", "SU_ID", "SUID"))
+  su_name_col <- find_col(c("SUPERVISORYUNIONNAME", "SU_NAME", "SUNAME"))
+  school_id_col <- find_col(c("SCHOOLIDENTIFIER", "SCHOOL_ID", "SCHOOLID"))
+  org_name_col <- find_col(c("ORGANIZATIONNAME", "ORG_NAME", "ORGNAME", "ORGANIZATION_NAME", "NAME"))
+
+  # Extract district info
+  if (!is.null(su_id_col)) {
+    result$district_id <- trimws(raw_data[[su_id_col]])
+  }
+  if (!is.null(su_name_col)) {
+    result$district_name <- trimws(raw_data[[su_name_col]])
   }
 
-  # Organization name
-  org_name_col <- find_col(c("ORG_NAME", "ORGNAME", "ORGANIZATION_NAME", "NAME"))
+  # Extract campus info - rows with school identifiers are campus level
+  if (!is.null(school_id_col)) {
+    result$campus_id <- trimws(raw_data[[school_id_col]])
+    # Empty school IDs should be NA
+    result$campus_id[result$campus_id == ""] <- NA_character_
+  }
   if (!is.null(org_name_col)) {
-    result$org_name <- trimws(raw_data[[org_name_col]])
+    result$campus_name <- trimws(raw_data[[org_name_col]])
   }
 
-  # Determine organization type (district vs school level)
-  # Vermont structure: SU = Supervisory Union, SD = School District
-  # Schools have longer IDs or different format
-  org_type_col <- find_col(c("ORG_TYPE", "ORGTYPE", "TYPE", "ORGANIZATION_TYPE"))
-  if (!is.null(org_type_col)) {
-    org_types <- trimws(raw_data[[org_type_col]])
-    result$type <- dplyr::case_when(
-      grepl("^(SU|SD|District|Supervisory)", org_types, ignore.case = TRUE) ~ "District",
-      grepl("^(School|Campus|Elementary|Middle|High)", org_types, ignore.case = TRUE) ~ "Campus",
-      TRUE ~ "District"  # Default to district for SU/SD level
-    )
+  # Determine organization type based on presence of school identifier
+  # If SCHOOLIDENTIFIER is present and non-empty, it's a campus row
+  # Otherwise it's a district-level aggregate row
+  if (!is.null(school_id_col)) {
+    has_school_id <- !is.na(result$campus_id) & result$campus_id != ""
+    result$type <- ifelse(has_school_id, "Campus", "District")
   } else {
-    # If no type column, default to district (aggregate level)
-    result$type <- rep("District", n_rows)
+    # Fallback: check for ORG_TYPE column
+    org_type_col <- find_col(c("ORG_TYPE", "ORGTYPE", "TYPE", "ORGANIZATION_TYPE"))
+    if (!is.null(org_type_col)) {
+      org_types <- trimws(raw_data[[org_type_col]])
+      result$type <- dplyr::case_when(
+        grepl("^(SU|SD|District|Supervisory)", org_types, ignore.case = TRUE) ~ "District",
+        grepl("^(School|Campus|Elementary|Middle|High)", org_types, ignore.case = TRUE) ~ "Campus",
+        TRUE ~ "District"
+      )
+    } else {
+      result$type <- rep("Campus", n_rows)
+    }
   }
 
-  # Map org_id to district_id and campus_id based on type
-  # For districts: district_id = org_id, campus_id = NA
-  # For campuses: need to extract district portion if possible
-  result$district_id <- ifelse(result$type == "District", result$org_id, NA_character_)
-  result$campus_id <- ifelse(result$type == "Campus", result$org_id, NA_character_)
-
-  # District and campus names
-  result$district_name <- ifelse(result$type == "District", result$org_name, NA_character_)
-  result$campus_name <- ifelse(result$type == "Campus", result$org_name, NA_character_)
+  # For district rows, campus_name should be NA
+  result$campus_name[result$type == "District"] <- NA_character_
 
   # County - if available
   county_col <- find_col(c("COUNTY", "CNTY", "COUNTY_NAME"))
@@ -90,18 +106,18 @@ process_enr <- function(raw_data, end_year) {
   }
 
   # Grade-level enrollment
-  # Vermont uses: PREK, K_FULL, K_PART, GR01, GR02, ..., GR12, ADULT
-  # Or: PREK, K, 1, 2, ..., 12
+  # Vermont VED uses: PRESCHOOL, KINDERGARTENFULLTIME, KINDERGARTENPARTTIME,
+  # FIRSTGRADE, SECONDGRADE, ..., TWELFTHGRADE
 
-  # PreK
-  pk_col <- find_col(c("PREK", "PRE_K", "PRE-K", "GRADE_PK", "PK"))
+  # PreK (called "Preschool" in VED)
+  pk_col <- find_col(c("PRESCHOOL", "PREK", "PRE_K", "PRE-K", "GRADE_PK", "PK"))
   if (!is.null(pk_col)) {
     result$grade_pk <- safe_numeric(raw_data[[pk_col]])
   }
 
-  # Kindergarten - may be split into full/part
-  k_full_col <- find_col(c("K_FULL", "KFULL", "K-FULL"))
-  k_part_col <- find_col(c("K_PART", "KPART", "K-PART"))
+  # Kindergarten - VED splits into full/part time
+  k_full_col <- find_col(c("KINDERGARTENFULLTIME", "K_FULL", "KFULL", "K-FULL"))
+  k_part_col <- find_col(c("KINDERGARTENPARTTIME", "K_PART", "KPART", "K-PART"))
   k_col <- find_col(c("K", "KG", "KINDERGARTEN", "GRADE_K"))
 
   if (!is.null(k_full_col) && !is.null(k_part_col)) {
@@ -116,11 +132,18 @@ process_enr <- function(raw_data, end_year) {
     result$grade_k <- safe_numeric(raw_data[[k_col]])
   }
 
-  # Grades 1-12
+  # Grades 1-12 - VED uses word names (FIRSTGRADE, SECONDGRADE, etc.)
+  grade_word_names <- c(
+    "FIRSTGRADE", "SECONDGRADE", "THIRDGRADE", "FOURTHGRADE",
+    "FIFTHGRADE", "SIXTHGRADE", "SEVENTHGRADE", "EIGHTHGRADE",
+    "NINTHGRADE", "TENTHGRADE", "ELEVENTHGRADE", "TWELFTHGRADE"
+  )
+
   for (g in 1:12) {
     grade_str <- sprintf("%02d", g)
-    # Try various column name formats
+    # Try word name first, then numeric patterns
     patterns <- c(
+      grade_word_names[g],
       paste0("GR", grade_str),
       paste0("GRADE_", grade_str),
       paste0("GRADE", grade_str),
@@ -146,10 +169,6 @@ process_enr <- function(raw_data, end_year) {
       result$row_total <- rowSums(grade_matrix)
     }
   }
-
-  # Remove temporary columns
-  result$org_id <- NULL
-  result$org_name <- NULL
 
   # Create state aggregate
   state_aggregate <- create_state_aggregate(result, end_year)

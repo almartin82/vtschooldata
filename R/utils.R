@@ -50,11 +50,11 @@ safe_numeric <- function(x) {
 #' get_available_years()
 get_available_years <- function() {
 
-  # Vermont Education Dashboard enrollment data is available from 2017 onwards
 
-  # The dashboard contains historical data going back to 2016-17 school year
+  # Vermont Education Dashboard enrollment data includes historical data
+  # going back to the 2003-04 school year (end_year = 2004)
   # Data is measured on October 1 of each school year
-  2017:2025
+  2004:2025
 }
 
 

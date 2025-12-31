@@ -7,6 +7,9 @@ template:
 home:
   title: vtschooldata - Vermont School Enrollment Data
   description: An R package for fetching and analyzing Vermont public school enrollment data from the Vermont Agency of Education.
+  links:
+    - text: "Part of the 50 State Schooldata Family"
+      href: https://github.com/almartin82/njschooldata
 
 navbar:
   structure:

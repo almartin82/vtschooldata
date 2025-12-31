@@ -13,8 +13,11 @@
 #' via the Vermont Education Dashboard (VED).
 #'
 #' @param end_year A school year end. Year is the end of the academic year - eg 2023-24
-#'   school year is year '2024'. Valid values are 2017-2025. Data is collected on
-#'   October 1 of each school year.
+#'   school year is year '2024'. Valid values are 2004-2025 (2003-04 through 2024-25
+#'   school years). Data is collected on October 1 of each school year.
+#'
+#' @note The 2017-18 (end_year = 2018) data appears to have quality issues in the
+#'   source file, with significantly lower enrollment than expected.
 #' @param tidy If TRUE (default), returns data in long (tidy) format with subgroup
 #'   column. If FALSE, returns wide format.
 #' @param use_cache If TRUE (default), uses locally cached data when available.
