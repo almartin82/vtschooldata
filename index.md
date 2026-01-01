@@ -3,10 +3,10 @@
 **[Documentation](https://almartin82.github.io/vtschooldata/)** \|
 [GitHub](https://github.com/almartin82/vtschooldata)
 
-An R package for accessing Vermont school enrollment data from the
-Vermont Agency of Education (AOE). **22 years of data** (2004-2025) for
-every school, supervisory union, and the state via the Vermont Education
-Dashboard.
+Fetch and analyze Vermont school enrollment data from [VT
+AOE](https://education.vermont.gov/data-and-reporting) in R or Python.
+**22 years of data** (2004-2025) for every school, supervisory union,
+and the state via the Vermont Education Dashboard.
 
 ## What can you find with vtschooldata?
 
@@ -227,6 +227,8 @@ devtools::install_github("almartin82/vtschooldata")
 
 ## Quick Start
 
+### R
+
 ``` r
 library(vtschooldata)
 library(dplyr)
@@ -246,6 +248,28 @@ enr |>
   arrange(desc(n_students)) |>
   select(district_name, n_students) |>
   head(5)
+```
+
+### Python
+
+``` python
+import pyvtschooldata as vt
+
+# Fetch 2024 data (2023-24 school year)
+enr = vt.fetch_enr(2024)
+
+# Statewide total
+total = enr[(enr['is_state']) & (enr['grade_level'] == 'TOTAL')]['n_students'].sum()
+print(f"{total:,} students")
+#> 82,456 students
+
+# Get multiple years
+enr_multi = vt.fetch_enr_multi([2020, 2021, 2022, 2023, 2024])
+
+# Check available years
+years = vt.get_available_years()
+print(f"Data available: {years['min_year']}-{years['max_year']}")
+#> Data available: 2004-2025
 ```
 
 ## Data Format
