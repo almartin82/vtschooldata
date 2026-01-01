@@ -14,8 +14,7 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   warning = FALSE,
-  message = FALSE,
-  eval = FALSE
+  message = FALSE
 )
 ```
 
@@ -128,47 +127,42 @@ grade_dist %>%
   theme(legend.position = "none")
 ```
 
-## Regional Patterns: Chittenden County Anchors the State
+## Regional Patterns: Burlington Leads Vermont
 
-Vermont's 14 counties show stark differences. Chittenden (Burlington area) is the population center, while rural counties struggle with declining enrollment.
+Vermont's Supervisory Unions show stark differences in size. Burlington area SUs dominate the enrollment landscape, while rural areas struggle with declining numbers.
 
 ```{r regional-data}
 enr_regional <- fetch_enr_multi(c(2015, 2020, 2024))
 
-# Group by county if available
-regional <- enr_regional %>%
+# Identify the largest SUs and track their trends
+top_sus <- enr_regional %>%
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
-         !is.na(county)) %>%
-  group_by(end_year, county) %>%
-  summarize(total = sum(n_students, na.rm = TRUE), .groups = "drop") %>%
-  arrange(end_year, desc(total))
-
-# Get top counties
-top_counties <- regional %>%
-  filter(end_year == 2024) %>%
-  arrange(desc(total)) %>%
+         end_year == 2024) %>%
+  arrange(desc(n_students)) %>%
   head(6) %>%
-  pull(county)
+  pull(district_id)
 
-regional_top <- regional %>%
-  filter(county %in% top_counties)
+regional_top <- enr_regional %>%
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
+         district_id %in% top_sus) %>%
+  select(end_year, district_name, n_students)
 
 regional_top %>%
-  pivot_wider(names_from = end_year, values_from = total)
+  pivot_wider(names_from = end_year, values_from = n_students)
 ```
 
-```{r regional-chart, fig.cap="Enrollment trends by county in Vermont"}
-ggplot(regional_top, aes(x = end_year, y = total, color = county)) +
+```{r regional-chart, fig.cap="Enrollment trends for top Vermont SUs"}
+ggplot(regional_top, aes(x = end_year, y = n_students, color = district_name)) +
   geom_line(linewidth = 1.2) +
   geom_point(size = 3) +
   scale_y_continuous(labels = scales::comma) +
   scale_color_brewer(palette = "Dark2") +
   labs(
-    title = "Enrollment by County: Top 6 Vermont Counties",
-    subtitle = "Chittenden County (Burlington) dominates; rural counties declining",
+    title = "Enrollment by Top 6 Vermont Supervisory Unions",
+    subtitle = "Burlington area dominates; trends vary across SUs",
     x = "Year",
     y = "Students",
-    color = "County"
+    color = "SU"
   ) +
   theme(legend.position = "right")
 ```
