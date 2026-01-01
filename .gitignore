@@ -8,4 +8,5 @@ src/*.dll
 /doc/
 /Meta/
 *.Rcheck/
+..Rcheck/
 *_cache/
