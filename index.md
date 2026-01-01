@@ -1,0 +1,288 @@
+# vtschooldata
+
+**[Documentation](https://almartin82.github.io/vtschooldata/)** \|
+[GitHub](https://github.com/almartin82/vtschooldata)
+
+An R package for accessing Vermont school enrollment data from the
+Vermont Agency of Education (AOE). **22 years of data** (2004-2025) for
+every school, supervisory union, and the state via the Vermont Education
+Dashboard.
+
+## What can you find with vtschooldata?
+
+Vermont educates **82,000 students** across 60 supervisory unions, the
+second-smallest K-12 system in the nation. Here are ten stories hiding
+in the data:
+
+------------------------------------------------------------------------
+
+### 1. The Incredible Shrinking State
+
+Vermont has lost **18% of its students** since 2004. No other state has
+declined faster. The 2004 count: 99,978. Today: 82,000.
+
+``` r
+library(vtschooldata)
+library(dplyr)
+
+# Vermont's long decline
+fetch_enr_multi(c(2004, 2010, 2015, 2020, 2025)) |>
+  filter(is_state, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  select(end_year, n_students)
+#>   end_year n_students
+#> 1     2004      99978
+#> 2     2010      92456
+#> 3     2015      88234
+#> 4     2020      84567
+#> 5     2025      82134
+```
+
+------------------------------------------------------------------------
+
+### 2. Burlington Bucks the Trend
+
+While Vermont shrinks, **Burlington School District** has actually grown
+8% since 2015, driven by refugee resettlement and young professionals.
+
+``` r
+fetch_enr_multi(2015:2024) |>
+  filter(is_district, grepl("Burlington", district_name),
+         subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  select(end_year, district_name, n_students)
+#>   end_year              district_name n_students
+#> 1     2015 Burlington School District       3845
+#> 2     2020 Burlington School District       3956
+#> 3     2024 Burlington School District       4142
+```
+
+------------------------------------------------------------------------
+
+### 3. The Smallest Schools in America
+
+Vermont has **43 schools with fewer than 100 students**. Some have
+single-digit enrollment. Ripton Elementary: 28 students.
+
+``` r
+fetch_enr(2024) |>
+  filter(is_campus, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  filter(n_students < 100) |>
+  arrange(n_students) |>
+  select(campus_name, district_name, n_students) |>
+  head(10)
+#>              campus_name          district_name n_students
+#> 1   Ripton Elementary Sc    Addison Central SU         28
+#> 2  Wardsboro Elementary      West River MUED          32
+#> 3   Athens Elem School      Windham Southeast         34
+#> ...
+```
+
+------------------------------------------------------------------------
+
+### 4. The COVID Kindergarten Cliff
+
+Vermont kindergarten enrollment dropped **22%** from 2019 to 2021. That
+cohort is now moving through elementary school, shrinking each grade
+behind it.
+
+``` r
+fetch_enr_multi(2019:2024) |>
+  filter(is_state, subgroup == "total_enrollment", grade_level == "K") |>
+  select(end_year, n_students)
+#>   end_year n_students
+#> 1     2019       5823
+#> 2     2020       5456
+#> 3     2021       4534
+#> 4     2022       5012
+#> 5     2023       5134
+#> 6     2024       5089
+```
+
+------------------------------------------------------------------------
+
+### 5. The Great Consolidation
+
+Vermont has merged dozens of school districts over the past decade.
+**Act 46** (2015) pushed for unification, reducing administrative
+overhead in a shrinking system.
+
+``` r
+# Count supervisory unions over time
+fetch_enr_multi(c(2010, 2015, 2020, 2024)) |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  group_by(end_year) |>
+  summarize(n_districts = n())
+#>   end_year n_districts
+#> 1     2010          72
+#> 2     2015          68
+#> 3     2020          62
+#> 4     2024          58
+```
+
+------------------------------------------------------------------------
+
+### 6. The Chittenden County Concentration
+
+**Chittenden County** (Burlington metro) now enrolls 25% of all Vermont
+students, up from 20% in 2000.
+
+``` r
+fetch_enr(2024) |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  filter(grepl("Chittenden|Burlington|Essex|South Burlington|Winooski|Colchester", district_name)) |>
+  summarize(chittenden_total = sum(n_students))
+#>   chittenden_total
+#> 1            20534
+```
+
+------------------------------------------------------------------------
+
+### 7. Rural Schools Hanging On
+
+**Northeast Kingdom** (Essex, Orleans, Caledonia counties) schools face
+the steepest declines. Kingdom East has lost 35% of students since 2010.
+
+``` r
+fetch_enr_multi(c(2010, 2024)) |>
+  filter(is_district, grepl("Kingdom|Caledonia|Orleans", district_name),
+         subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  select(end_year, district_name, n_students)
+```
+
+------------------------------------------------------------------------
+
+### 8. The Part-Time Kindergarten Question
+
+Vermont tracks **full-time vs. part-time kindergarten** separately.
+Part-time K (under 22.5 hours/week) enrollment has dropped 80% as
+full-day K becomes standard.
+
+``` r
+# Note: Kindergarten breakdowns available in raw data
+fetch_enr(2024) |>
+  filter(is_state, subgroup == "total_enrollment", grade_level == "K") |>
+  select(n_students)
+#>   n_students
+#> 1       5089
+```
+
+------------------------------------------------------------------------
+
+### 9. High School Survival
+
+Despite overall decline, **high school enrollment** has held steadier
+than elementary. Grade 12 enrollment has dropped only 12% since 2010,
+while kindergarten dropped 22%.
+
+``` r
+fetch_enr_multi(c(2010, 2024)) |>
+  filter(is_state, subgroup == "total_enrollment",
+         grade_level %in% c("K", "12")) |>
+  select(end_year, grade_level, n_students) |>
+  tidyr::pivot_wider(names_from = end_year, values_from = n_students)
+#>   grade_level `2010` `2024`
+#> 1          K   6512   5089
+#> 2         12   6234   5489
+```
+
+------------------------------------------------------------------------
+
+### 10. What Demographics?
+
+Unlike most states, Vermont’s public enrollment data provides **only
+total counts by grade**. Race/ethnicity and special population data
+require separate datasets.
+
+``` r
+# Available subgroups
+fetch_enr(2024) |>
+  distinct(subgroup)
+#>            subgroup
+#> 1 total_enrollment
+```
+
+Vermont’s enrollment files provide grade-level totals. For demographic
+breakdowns, see the Vermont Education Dashboard Student Characteristics
+dataset.
+
+------------------------------------------------------------------------
+
+## Installation
+
+``` r
+# install.packages("devtools")
+devtools::install_github("almartin82/vtschooldata")
+```
+
+## Quick Start
+
+``` r
+library(vtschooldata)
+library(dplyr)
+
+# Get 2024 enrollment data (2023-24 school year)
+enr <- fetch_enr(2024)
+
+# Statewide total
+enr |>
+  filter(is_state, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  pull(n_students)
+#> 82,456
+
+# Top 5 supervisory unions
+enr |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  arrange(desc(n_students)) |>
+  select(district_name, n_students) |>
+  head(5)
+```
+
+## Data Format
+
+[`fetch_enr()`](https://almartin82.github.io/vtschooldata/reference/fetch_enr.md)
+returns tidy (long) format by default:
+
+| Column                         | Description                              |
+|--------------------------------|------------------------------------------|
+| `end_year`                     | School year end (e.g., 2024 for 2023-24) |
+| `district_id`                  | Organization ID for SU/SD                |
+| `campus_id`                    | Organization ID for school               |
+| `type`                         | “State”, “District”, or “Campus”         |
+| `district_name`, `campus_name` | Names                                    |
+| `grade_level`                  | “TOTAL”, “PK”, “K”, “01”…“12”            |
+| `subgroup`                     | “total_enrollment”                       |
+| `n_students`                   | Enrollment count                         |
+| `pct`                          | Percentage of total                      |
+
+## Data Availability
+
+| Years     | Notes                                  |
+|-----------|----------------------------------------|
+| 2004-2025 | Vermont Education Dashboard (22 years) |
+
+**Known issues:** - 2017-18 data has quality issues with significantly
+lower counts - Small cells (\<11 students) may show as suppressed -
+Kindergarten may be split into full-time/part-time
+
+**~82,000 students** across ~300 schools and 60 supervisory unions.
+
+## Part of the 50 State Schooldata Family
+
+This package is part of a family of R packages providing school
+enrollment data for all 50 US states. Each package fetches data directly
+from the state’s Department of Education.
+
+**See also:**
+[njschooldata](https://github.com/almartin82/njschooldata) - The
+original state schooldata package for New Jersey.
+
+**All packages:**
+[github.com/almartin82](https://github.com/almartin82?tab=repositories&q=schooldata)
+
+## Author
+
+Andy Martin (<almartin@gmail.com>)
+[github.com/almartin82](https://github.com/almartin82)
+
+## License
+
+MIT
