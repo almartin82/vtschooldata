@@ -1,4 +1,4 @@
 # License
 
-    YEAR: 2025
-    COPYRIGHT HOLDER: Al Martin
+    YEAR: 2026
+    COPYRIGHT HOLDER: Andy Martin <almartin@gmail.com>
