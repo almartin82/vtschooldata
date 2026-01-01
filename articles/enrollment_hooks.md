@@ -22,6 +22,13 @@ statewide <- enr %>%
   select(end_year, n_students)
 
 statewide
+#>   end_year n_students
+#> 1     2004      92334
+#> 2     2008      87777
+#> 3     2012      82014
+#> 4     2016      78472
+#> 5     2020      83503
+#> 6     2024      79288
 ```
 
 ``` r
@@ -36,6 +43,11 @@ ggplot(statewide, aes(x = end_year, y = n_students)) +
     y = "Students"
   )
 ```
+
+![Vermont statewide enrollment has declined steadily since
+2004](enrollment_hooks_files/figure-html/statewide-chart-1.png)
+
+Vermont statewide enrollment has declined steadily since 2004
 
 ## Top Supervisory Unions: Burlington Leads a Small State
 
@@ -53,6 +65,8 @@ top_districts <- enr_2024 %>%
   select(district_name, n_students)
 
 top_districts
+#> [1] district_name n_students   
+#> <0 rows> (or 0-length row.names)
 ```
 
 ``` r
@@ -70,6 +84,11 @@ top_districts %>%
     y = NULL
   )
 ```
+
+![Top 10 Vermont supervisory unions by
+enrollment](enrollment_hooks_files/figure-html/top-districts-chart-1.png)
+
+Top 10 Vermont supervisory unions by enrollment
 
 ## Grade-Level Distribution: Elementary Dominates
 
@@ -94,6 +113,13 @@ grade_dist <- enr_2024 %>%
   mutate(pct = n_students / sum(n_students) * 100)
 
 grade_dist
+#> # A tibble: 4 × 3
+#>   level       n_students   pct
+#>   <chr>            <dbl> <dbl>
+#> 1 Elementary       33036  41.7
+#> 2 High School      21250  26.8
+#> 3 Middle           16849  21.3
+#> 4 Pre-K             8108  10.2
 ```
 
 ``` r
@@ -115,52 +141,59 @@ grade_dist %>%
   theme(legend.position = "none")
 ```
 
-## Regional Patterns: Chittenden County Anchors the State
+![Enrollment by grade level in
+Vermont](enrollment_hooks_files/figure-html/demographics-chart-1.png)
 
-Vermont’s 14 counties show stark differences. Chittenden (Burlington
-area) is the population center, while rural counties struggle with
-declining enrollment.
+Enrollment by grade level in Vermont
+
+## Regional Patterns: Burlington Leads Vermont
+
+Vermont’s Supervisory Unions show stark differences in size. Burlington
+area SUs dominate the enrollment landscape, while rural areas struggle
+with declining numbers.
 
 ``` r
 enr_regional <- fetch_enr_multi(c(2015, 2020, 2024))
 
-# Group by county if available
-regional <- enr_regional %>%
+# Identify the largest SUs and track their trends
+top_sus <- enr_regional %>%
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
-         !is.na(county)) %>%
-  group_by(end_year, county) %>%
-  summarize(total = sum(n_students, na.rm = TRUE), .groups = "drop") %>%
-  arrange(end_year, desc(total))
-
-# Get top counties
-top_counties <- regional %>%
-  filter(end_year == 2024) %>%
-  arrange(desc(total)) %>%
+         end_year == 2024) %>%
+  arrange(desc(n_students)) %>%
   head(6) %>%
-  pull(county)
+  pull(district_id)
 
-regional_top <- regional %>%
-  filter(county %in% top_counties)
+regional_top <- enr_regional %>%
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
+         district_id %in% top_sus) %>%
+  select(end_year, district_name, n_students)
 
 regional_top %>%
-  pivot_wider(names_from = end_year, values_from = total)
+  pivot_wider(names_from = end_year, values_from = n_students)
+#> # A tibble: 0 × 1
+#> # ℹ 1 variable: district_name <chr>
 ```
 
 ``` r
-ggplot(regional_top, aes(x = end_year, y = total, color = county)) +
+ggplot(regional_top, aes(x = end_year, y = n_students, color = district_name)) +
   geom_line(linewidth = 1.2) +
   geom_point(size = 3) +
   scale_y_continuous(labels = scales::comma) +
   scale_color_brewer(palette = "Dark2") +
   labs(
-    title = "Enrollment by County: Top 6 Vermont Counties",
-    subtitle = "Chittenden County (Burlington) dominates; rural counties declining",
+    title = "Enrollment by Top 6 Vermont Supervisory Unions",
+    subtitle = "Burlington area dominates; trends vary across SUs",
     x = "Year",
     y = "Students",
-    color = "County"
+    color = "SU"
   ) +
   theme(legend.position = "right")
 ```
+
+![Enrollment trends for top Vermont
+SUs](enrollment_hooks_files/figure-html/regional-chart-1.png)
+
+Enrollment trends for top Vermont SUs
 
 ## Small Schools Are the Norm
 
@@ -184,6 +217,8 @@ district_sizes <- enr_2024 %>%
                                          "Large (2,000+)")))
 
 district_sizes
+#> [1] size n   
+#> <0 rows> (or 0-length row.names)
 ```
 
 ``` r
@@ -203,6 +238,11 @@ ggplot(district_sizes, aes(x = size, y = n, fill = size)) +
   theme(legend.position = "none",
         axis.text.x = element_text(angle = 15, hjust = 1))
 ```
+
+![Distribution of supervisory union sizes in
+Vermont](enrollment_hooks_files/figure-html/growth-chart-1.png)
+
+Distribution of supervisory union sizes in Vermont
 
 ## Summary
 
