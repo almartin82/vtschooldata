@@ -6,7 +6,7 @@
 \alias{vtschooldata}
 \title{vtschooldata: Fetch and Process Vermont School Data}
 \description{
-Downloads and processes school data from the Vermont Agency of Education (AOE).
+Downloads and processes school data from the Vermont Agency of Education.
 Provides functions for fetching enrollment data from the Vermont Education
 Dashboard (VED) and transforming it into tidy format for analysis.
 }
@@ -14,7 +14,7 @@ Dashboard (VED) and transforming it into tidy format for analysis.
 
 \describe{
 \item{\code{\link{fetch_enr}}}{Fetch enrollment data for a school year}
-\item{\code{\link{fetch_enr_multi}}}{Fetch enrollment data for multiple years}
+\item{\code{\link{fetch_enr_multi}}}{Fetch enrollment for multiple years}
 \item{\code{\link{tidy_enr}}}{Transform wide data to tidy (long) format}
 \item{\code{\link{id_enr_aggs}}}{Add aggregation level flags}
 \item{\code{\link{enr_grade_aggs}}}{Create grade-level aggregations}
@@ -34,19 +34,19 @@ Dashboard (VED) and transforming it into tidy format for analysis.
 
 Vermont uses organization IDs (ORG_ID) that identify:
 \itemize{
-\item Supervisory Unions (SU): Administrative units overseeing multiple school districts
+\item Supervisory Unions (SU): Administrative units
 \item School Districts (SD): Individual school districts
 \item Schools: Individual school buildings
 }
-Vermont has approximately 60 supervisory unions/school districts and 300+ public schools.
+Vermont has approximately 60 supervisory unions/districts and 300+ schools.
 }
 
 \section{Data Sources}{
 
-Data is sourced from the Vermont Agency of Education's Vermont Education Dashboard:
+Data is sourced from the Vermont Education Dashboard (VED):
 \itemize{
-\item VED Enrollment: \url{https://education.vermont.gov/data-and-reporting/vermont-education-dashboard/vermont-education-dashboard-enrollment}
-\item Data Portal: \url{https://education.vermont.gov/data-and-reporting}
+\item VED Enrollment data page on education.vermont.gov
+\item Data Portal: education.vermont.gov/data-and-reporting
 }
 }
 
