@@ -112,3 +112,17 @@ PRs auto-merge when ALL CI checks pass:
 - pkgdown build (vignettes must render)
 
 If CI fails, fix the issue and push - auto-merge triggers when checks pass.
+
+---
+
+## README Images from Vignettes (REQUIRED)
+
+**NEVER use `man/figures/` or `generate_readme_figs.R` for README images.**
+
+README images MUST come from pkgdown-generated vignette output so they auto-update on merge:
+
+```markdown
+![Chart name](https://almartin82.github.io/{package}/articles/{vignette}_files/figure-html/{chunk-name}-1.png)
+```
+
+**Why:** Vignette figures regenerate automatically when pkgdown builds. Manual `man/figures/` requires running a separate script and is easy to forget, causing stale/broken images.
