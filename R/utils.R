@@ -21,7 +21,8 @@ safe_numeric <- function(x) {
 
   # Handle common suppression markers used by Vermont AOE
   # *** is used for suppressed small counts
-  x[x %in% c("*", "***", ".", "-", "-1", "<5", "N/A", "NA", "", "NULL")] <- NA_character_
+  suppression_markers <- c("*", "***", ".", "-", "-1", "<5", "N/A", "NA", "", "NULL")
+  x[x %in% suppression_markers] <- NA_character_
 
   suppressWarnings(as.numeric(x))
 }
@@ -64,7 +65,10 @@ build_ved_url <- function() {
   # because the date suffix changes with each update.
 
   # Try to get the current download URL from the document page
-  doc_url <- "https://education.vermont.gov/document/vermont-education-dashboard-dataset-enrollment"
+  doc_url <- paste0(
+    "https://education.vermont.gov/document/",
+    "vermont-education-dashboard-dataset-enrollment"
+  )
 
   tryCatch({
     response <- httr::GET(
@@ -80,10 +84,11 @@ build_ved_url <- function() {
     content <- httr::content(response, "text", encoding = "UTF-8")
 
     # Extract the xlsx file URL from the page
-    xlsx_match <- regmatches(
-      content,
-      regexpr('href="(/sites/aoe/files/documents/edu-ved-enrollment-dataset-[0-9]+\\.xlsx)"', content)
+    xlsx_pattern <- paste0(
+      'href="(/sites/aoe/files/documents/',
+      'edu-ved-enrollment-dataset-[0-9]+\\.xlsx)"'
     )
+    xlsx_match <- regmatches(content, regexpr(xlsx_pattern, content))
 
     if (length(xlsx_match) == 0 || xlsx_match == "") {
       stop("Could not find enrollment dataset download link")
@@ -96,8 +101,11 @@ build_ved_url <- function() {
 
   }, error = function(e) {
     # Fallback to known recent URL if scraping fails
-    message("Note: Using fallback URL. If download fails, Vermont AOE may have updated the file.")
-    "https://education.vermont.gov/sites/aoe/files/documents/edu-ved-enrollment-dataset-20251125.xlsx"
+    message("Note: Using fallback URL. If download fails, check AOE.")
+    paste0(
+      "https://education.vermont.gov/sites/aoe/files/documents/",
+      "edu-ved-enrollment-dataset-20251125.xlsx"
+    )
   })
 }
 
@@ -111,11 +119,8 @@ build_ved_url <- function() {
 #' @return Integer end year
 #' @keywords internal
 parse_school_year <- function(sy) {
-  # Handle various formats:
-  # "2023-2024" -> 2024
-  # "SY 2023-24" -> 2024
-  # "2023-24" -> 2024
-  # "2024" -> 2024
+  # Handle various formats like "2023-2024", "SY 2023-24", "2023-24", "2024"
+  # All return the end year (2024 in these examples)
 
   sy <- trimws(as.character(sy))
 
