@@ -17,8 +17,8 @@ Vermont now educates fewer than 80,000 students.
 ``` r
 enr <- fetch_enr_multi(c(2004, 2008, 2012, 2016, 2020, 2024))
 
-statewide <- enr %>%
-  filter(is_state, subgroup == "total_enrollment", grade_level == "TOTAL") %>%
+statewide <- enr |>
+  filter(is_state, subgroup == "total_enrollment", grade_level == "TOTAL") |>
   select(end_year, n_students)
 
 statewide
@@ -58,10 +58,10 @@ districts are small by national standards.
 ``` r
 enr_2024 <- fetch_enr(2024)
 
-top_districts <- enr_2024 %>%
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") %>%
-  arrange(desc(n_students)) %>%
-  head(10) %>%
+top_districts <- enr_2024 |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  arrange(desc(n_students)) |>
+  head(10) |>
   select(district_name, n_students)
 
 top_districts
@@ -70,13 +70,18 @@ top_districts
 ```
 
 ``` r
-top_districts %>%
-  mutate(district_name = gsub(" Supervisory Union| Supervisory District| School District| SD| SU", "", district_name)) %>%
-  mutate(district_name = factor(district_name, levels = rev(district_name))) %>%
+# Shorten district names for display
+su_pattern <- " Supervisory Union| Supervisory District| School District| SD| SU"
+top_districts |>
+  mutate(district_name = gsub(su_pattern, "", district_name)) |>
+  mutate(district_name = factor(district_name, levels = rev(district_name))) |>
   ggplot(aes(x = n_students, y = district_name)) +
   geom_col(fill = "#006837") +
   geom_text(aes(label = scales::comma(n_students)), hjust = -0.1, size = 3.5) +
-  scale_x_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.15))) +
+  scale_x_continuous(
+    labels = scales::comma,
+    expand = expansion(mult = c(0, 0.15))
+  ) +
   labs(
     title = "Largest Supervisory Unions in Vermont (2024)",
     subtitle = "Even the largest districts serve fewer than 4,000 students",
@@ -98,18 +103,19 @@ cohorts reflecting years of declining births.
 
 ``` r
 # Vermont data focuses on grade levels rather than demographic subgroups
-grade_dist <- enr_2024 %>%
+grade_levels <- c("PK", "K", "01", "02", "03", "04", "05",
+                  "06", "07", "08", "09", "10", "11", "12")
+grade_dist <- enr_2024 |>
   filter(is_state, subgroup == "total_enrollment",
-         grade_level %in% c("PK", "K", "01", "02", "03", "04", "05",
-                            "06", "07", "08", "09", "10", "11", "12")) %>%
+         grade_level %in% grade_levels) |>
   mutate(level = case_when(
     grade_level == "PK" ~ "Pre-K",
     grade_level %in% c("K", "01", "02", "03", "04", "05") ~ "Elementary",
     grade_level %in% c("06", "07", "08") ~ "Middle",
     TRUE ~ "High School"
-  )) %>%
-  group_by(level) %>%
-  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") %>%
+  )) |>
+  group_by(level) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
   mutate(pct = n_students / sum(n_students) * 100)
 
 grade_dist
@@ -123,15 +129,22 @@ grade_dist
 ```
 
 ``` r
-grade_dist %>%
-  mutate(level = factor(level, levels = c("Pre-K", "Elementary", "Middle", "High School"))) %>%
+level_order <- c("Pre-K", "Elementary", "Middle", "High School")
+level_colors <- c("Pre-K" = "#78c679", "Elementary" = "#31a354",
+                  "Middle" = "#006837", "High School" = "#00441b")
+grade_dist |>
+  mutate(level = factor(level, levels = level_order)) |>
   ggplot(aes(x = level, y = n_students, fill = level)) +
   geom_col() +
-  geom_text(aes(label = paste0(scales::comma(n_students), "\n(", round(pct), "%)")),
-            vjust = -0.2, size = 3.5) +
-  scale_fill_manual(values = c("Pre-K" = "#78c679", "Elementary" = "#31a354",
-                               "Middle" = "#006837", "High School" = "#00441b")) +
-  scale_y_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.15))) +
+  geom_text(
+    aes(label = paste0(scales::comma(n_students), "\n(", round(pct), "%)")),
+    vjust = -0.2, size = 3.5
+  ) +
+  scale_fill_manual(values = level_colors) +
+  scale_y_continuous(
+    labels = scales::comma,
+    expand = expansion(mult = c(0, 0.15))
+  ) +
   labs(
     title = "Vermont Enrollment by Grade Level (2024)",
     subtitle = "Elementary grades (K-5) make up the largest share",
@@ -156,19 +169,19 @@ with declining numbers.
 enr_regional <- fetch_enr_multi(c(2015, 2020, 2024))
 
 # Identify the largest SUs and track their trends
-top_sus <- enr_regional %>%
+top_sus <- enr_regional |>
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
-         end_year == 2024) %>%
-  arrange(desc(n_students)) %>%
-  head(6) %>%
+         end_year == 2024) |>
+  arrange(desc(n_students)) |>
+  head(6) |>
   pull(district_id)
 
-regional_top <- enr_regional %>%
+regional_top <- enr_regional |>
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
-         district_id %in% top_sus) %>%
+         district_id %in% top_sus) |>
   select(end_year, district_name, n_students)
 
-regional_top %>%
+regional_top |>
   pivot_wider(names_from = end_year, values_from = n_students)
 #> # A tibble: 0 × 1
 #> # ℹ 1 variable: district_name <chr>
@@ -202,19 +215,20 @@ than 1,000 students, creating challenges for specialized programs and
 efficiency.
 
 ``` r
-district_sizes <- enr_2024 %>%
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") %>%
+size_levels <- c("Tiny (<200)", "Very Small (200-499)",
+                 "Small (500-999)", "Medium (1,000-1,999)",
+                 "Large (2,000+)")
+district_sizes <- enr_2024 |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
   mutate(size = case_when(
     n_students >= 2000 ~ "Large (2,000+)",
     n_students >= 1000 ~ "Medium (1,000-1,999)",
     n_students >= 500 ~ "Small (500-999)",
     n_students >= 200 ~ "Very Small (200-499)",
     TRUE ~ "Tiny (<200)"
-  )) %>%
-  count(size) %>%
-  mutate(size = factor(size, levels = c("Tiny (<200)", "Very Small (200-499)",
-                                         "Small (500-999)", "Medium (1,000-1,999)",
-                                         "Large (2,000+)")))
+  )) |>
+  count(size) |>
+  mutate(size = factor(size, levels = size_levels))
 
 district_sizes
 #> [1] size n   
@@ -222,12 +236,15 @@ district_sizes
 ```
 
 ``` r
+size_colors <- c(
+  "Tiny (<200)" = "#f03b20", "Very Small (200-499)" = "#feb24c",
+  "Small (500-999)" = "#ffeda0", "Medium (1,000-1,999)" = "#31a354",
+  "Large (2,000+)" = "#006837"
+)
 ggplot(district_sizes, aes(x = size, y = n, fill = size)) +
   geom_col() +
   geom_text(aes(label = n), vjust = -0.5, size = 4) +
-  scale_fill_manual(values = c("Tiny (<200)" = "#f03b20", "Very Small (200-499)" = "#feb24c",
-                               "Small (500-999)" = "#ffeda0", "Medium (1,000-1,999)" = "#31a354",
-                               "Large (2,000+)" = "#006837")) +
+  scale_fill_manual(values = size_colors) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
   labs(
     title = "Vermont Supervisory Unions by Size (2024)",
