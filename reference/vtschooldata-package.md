@@ -81,6 +81,8 @@ Dashboard:
 
 Useful links:
 
+- <https://almartin82.github.io/vtschooldata>
+
 - <https://github.com/almartin82/vtschooldata>
 
 - Report bugs at <https://github.com/almartin82/vtschooldata/issues>
