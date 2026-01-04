@@ -64,6 +64,7 @@ Data is sourced from the Vermont Agency of Education's Vermont Education Dashboa
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://almartin82.github.io/vtschooldata}
   \item \url{https://github.com/almartin82/vtschooldata}
   \item Report bugs at \url{https://github.com/almartin82/vtschooldata/issues}
 }
