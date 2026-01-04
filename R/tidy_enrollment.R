@@ -7,6 +7,11 @@
 #
 # ==============================================================================
 
+# Declare NSE variables used in dplyr operations
+utils::globalVariables(c(
+  "row_total", "n_students", "subgroup", "grade_level", "type"
+))
+
 #' Tidy enrollment data
 #'
 #' Transforms wide enrollment data to long format with subgroup column.
