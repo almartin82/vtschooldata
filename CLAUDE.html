@@ -138,7 +138,14 @@
 <h3 id="auto-merge-requirements">Auto-Merge Requirements<a class="anchor" aria-label="anchor" href="#auto-merge-requirements"></a></h3>
 <p>PRs auto-merge when ALL CI checks pass: - R-CMD-check (0 errors, 0 warnings) - Python tests (if py{st}schooldata exists) - pkgdown build (vignettes must render)</p>
 <p>If CI fails, fix the issue and push - auto-merge triggers when checks pass.</p>
+<hr></div>
 </div>
+<div class="section level2">
+<h2 id="readme-images-from-vignettes-required">README Images from Vignettes (REQUIRED)<a class="anchor" aria-label="anchor" href="#readme-images-from-vignettes-required"></a></h2>
+<p><strong>NEVER use <code>man/figures/</code> or <code>generate_readme_figs.R</code> for README images.</strong></p>
+<p>README images MUST come from pkgdown-generated vignette output so they auto-update on merge:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="al">![Chart name](https://almartin82.github.io/{package}/articles/{vignette}_files/figure-html/{chunk-name}-1.png)</span></span></code></pre></div>
+<p><strong>Why:</strong> Vignette figures regenerate automatically when pkgdown builds. Manual <code>man/figures/</code> requires running a separate script and is easy to forget, causing stale/broken images.</p>
 </div>
 
 
