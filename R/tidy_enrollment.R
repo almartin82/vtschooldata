@@ -9,7 +9,7 @@
 
 # Declare NSE variables used in dplyr operations
 utils::globalVariables(c(
-  "row_total", "n_students", "subgroup", "grade_level", "type"
+  "row_total", "n_students", "subgroup", "grade_level", "type", "aggregation_flag"
 ))
 
 #' Tidy enrollment data
@@ -92,7 +92,10 @@ tidy_enr <- function(df) {
           result_df$row_total <- df$row_total
           result_df <- result_df |>
             dplyr::mutate(
-              pct = n_students / row_total,
+              pct = dplyr::case_when(
+                row_total > 0 ~ pmin(n_students / row_total, 1.0),
+                TRUE ~ 0.0
+              ),
               subgroup = "total_enrollment",
               grade_level = gl
             ) |>
@@ -143,7 +146,15 @@ id_enr_aggs <- function(df) {
       is_district = type == "District",
 
       # Campus level: Type == "Campus"
-      is_campus = type == "Campus"
+      is_campus = type == "Campus",
+
+      # Aggregation flag: single column indicating level
+      aggregation_flag = dplyr::case_when(
+        type == "Campus" ~ "campus",
+        type == "District" ~ "district",
+        type == "State" ~ "state",
+        TRUE ~ "state"
+      )
     )
 }
 
