@@ -1,9 +1,9 @@
 # vtschooldata: Fetch and Process Vermont School Data
 
-Downloads and processes school data from the Vermont Agency of Education
-(AOE). Provides functions for fetching enrollment data from the Vermont
-Education Dashboard (VED) and transforming it into tidy format for
-analysis.
+Downloads and processes school data from the Vermont Agency of
+Education. Provides functions for fetching enrollment data from the
+Vermont Education Dashboard (VED) and transforming it into tidy format
+for analysis.
 
 ## Main functions
 
@@ -13,7 +13,7 @@ analysis.
 
 - [`fetch_enr_multi`](https://almartin82.github.io/vtschooldata/reference/fetch_enr_multi.md):
 
-  Fetch enrollment data for multiple years
+  Fetch enrollment for multiple years
 
 - [`tidy_enr`](https://almartin82.github.io/vtschooldata/reference/tidy_enr.md):
 
@@ -45,25 +45,22 @@ analysis.
 
 Vermont uses organization IDs (ORG_ID) that identify:
 
-- Supervisory Unions (SU): Administrative units overseeing multiple
-  school districts
+- Supervisory Unions (SU): Administrative units
 
 - School Districts (SD): Individual school districts
 
 - Schools: Individual school buildings
 
-Vermont has approximately 60 supervisory unions/school districts and
-300+ public schools.
+Vermont has approximately 60 supervisory unions/districts and 300+
+schools.
 
 ## Data Sources
 
-Data is sourced from the Vermont Agency of Education's Vermont Education
-Dashboard:
+Data is sourced from the Vermont Education Dashboard (VED):
 
-- VED Enrollment:
-  <https://education.vermont.gov/data-and-reporting/vermont-education-dashboard/vermont-education-dashboard-enrollment>
+- VED Enrollment data page on education.vermont.gov
 
-- Data Portal: <https://education.vermont.gov/data-and-reporting>
+- Data Portal: education.vermont.gov/data-and-reporting
 
 ## Data Characteristics
 

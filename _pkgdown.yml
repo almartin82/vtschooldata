@@ -45,6 +45,13 @@ reference:
   - id_enr_aggs
   - enr_grade_aggs
 
+- title: School Directory
+  desc: Fetch school directory information
+  contents:
+  - fetch_directory
+  - get_available_directory_years
+  - clear_directory_cache
+
 - title: Cache Management
   desc: Manage locally cached data
   contents:
