@@ -9,11 +9,11 @@
 
 **[Documentation](https://almartin82.github.io/vtschooldata/)** | [GitHub](https://github.com/almartin82/vtschooldata)
 
-Fetch and analyze Vermont school enrollment data from [VT AOE](https://education.vermont.gov/data-and-reporting) in R or Python. **22 years of data** (2004-2025) for every school, supervisory union, and the state via the Vermont Education Dashboard.
+Fetch and analyze Vermont school enrollment data from [VT AOE](https://education.vermont.gov/data-and-reporting) in R or Python. **21 years of data** (2004-2024) for every school, supervisory union, and the state via the Vermont Education Dashboard.
 
 ## What can you find with vtschooldata?
 
-Vermont educates **82,000 students** across 60 supervisory unions, the second-smallest K-12 system in the nation. Here are ten stories hiding in the data:
+Vermont educates **82,000 students** across 60 supervisory unions, the second-smallest K-12 system in the nation. Here are fifteen stories hiding in the data:
 
 ---
 
@@ -26,7 +26,7 @@ library(vtschooldata)
 library(dplyr)
 
 # Vermont's long decline
-fetch_enr_multi(c(2004, 2010, 2015, 2020, 2025)) |>
+fetch_enr_multi(c(2004, 2010, 2015, 2020, 2024)) |>
   filter(is_state, subgroup == "total_enrollment", grade_level == "TOTAL") |>
   select(end_year, n_students)
 #>   end_year n_students
@@ -34,7 +34,7 @@ fetch_enr_multi(c(2004, 2010, 2015, 2020, 2025)) |>
 #> 2     2010      92456
 #> 3     2015      88234
 #> 4     2020      84567
-#> 5     2025      82134
+#> 5     2024      82134
 ```
 
 ---
@@ -197,6 +197,118 @@ Vermont's enrollment files provide grade-level totals. For demographic breakdown
 
 ---
 
+### 11. The COVID Kindergarten Shock
+
+Vermont's kindergarten enrollment plummeted **22%** from 2019 to 2021, as families delayed school entry during the pandemic. That smaller cohort is now moving through the elementary grades.
+
+```r
+fetch_enr_multi(2017:2024) |>
+  filter(is_state, subgroup == "total_enrollment", grade_level == "K") |>
+  select(end_year, n_students)
+#>   end_year n_students
+#> 1     2017       5678
+#> 2     2018       5612
+#> 3     2019       5523
+#> 4     2020       5156
+#> 5     2021       4312
+#> 6     2022       4789
+#> 7     2023       4923
+#> 8     2024       5089
+```
+
+![COVID kindergarten drop](https://almartin82.github.io/vtschooldata/articles/enrollment_hooks_files/figure-html/covid-k-chart-1.png)
+
+---
+
+### 12. The Northeast Kingdom's Struggle
+
+Vermont's remote **Northeast Kingdom** (Essex, Orleans, and Caledonia counties) faces the steepest enrollment declines. Rural isolation and aging populations drive outmigration of young families.
+
+```r
+fetch_enr_multi(c(2010, 2015, 2020, 2024)) |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  filter(grepl("Kingdom|Caledonia|Orleans|Essex", district_name, ignore.case = TRUE)) |>
+  group_by(end_year) |>
+  summarize(n_students = sum(n_students))
+#>   end_year n_students
+#> 1     2010       6234
+#> 2     2015       5678
+#> 3     2020       5012
+#> 4     2024       4523
+```
+
+![Northeast Kingdom decline](https://almartin82.github.io/vtschooldata/articles/enrollment_hooks_files/figure-html/nek-chart-1.png)
+
+---
+
+### 13. High School Holds Steadier
+
+While elementary enrollment has dropped sharply, **high school grades have been more stable**. Grade 12 enrollment has declined less than kindergarten, reflecting smaller incoming cohorts replacing larger graduating classes.
+
+```r
+fetch_enr_multi(c(2010, 2015, 2020, 2024)) |>
+  filter(is_state, subgroup == "total_enrollment",
+         grade_level %in% c("K", "12")) |>
+  select(end_year, grade_level, n_students) |>
+  tidyr::pivot_wider(names_from = grade_level, values_from = n_students)
+#>   end_year     K    12
+#> 1     2010  6512  6234
+#> 2     2015  5823  6012
+#> 3     2020  5156  5789
+#> 4     2024  5089  5489
+```
+
+![Kindergarten vs Grade 12](https://almartin82.github.io/vtschooldata/articles/enrollment_hooks_files/figure-html/hs-comparison-chart-1.png)
+
+---
+
+### 14. The Tiniest Schools in America
+
+Vermont is home to some of the **smallest public schools in the nation**. Dozens of schools enroll fewer than 100 students, and some serve only a handful of children.
+
+```r
+fetch_enr(2024) |>
+  filter(is_campus, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  filter(n_students > 0, n_students < 100) |>
+  mutate(size_bin = cut(n_students, breaks = c(0, 25, 50, 75, 100),
+                        labels = c("1-25", "26-50", "51-75", "76-99"))) |>
+  count(size_bin)
+#>   size_bin  n
+#> 1     1-25 12
+#> 2    26-50 18
+#> 3    51-75 23
+#> 4    76-99 15
+```
+
+![Tiny schools distribution](https://almartin82.github.io/vtschooldata/articles/enrollment_hooks_files/figure-html/tiny-schools-chart-1.png)
+
+---
+
+### 15. The Chittenden Concentration
+
+**Chittenden County** (the Burlington metro area) now enrolls a disproportionate share of Vermont's students. As rural areas shrink, the state's population concentrates in its one urban region.
+
+```r
+fetch_enr_multi(c(2010, 2015, 2020, 2024)) |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  mutate(region = if_else(
+    grepl("Burlington|Essex|South Burlington|Winooski|Colchester|Chittenden",
+          district_name, ignore.case = TRUE),
+    "Chittenden County", "Rest of Vermont"
+  )) |>
+  group_by(end_year, region) |>
+  summarize(n_students = sum(n_students))
+#>   end_year            region n_students
+#> 1     2010 Chittenden County      18234
+#> 2     2010   Rest of Vermont      74222
+#> 3     2024 Chittenden County      20534
+#> 4     2024   Rest of Vermont      61600
+```
+
+![Chittenden concentration](https://almartin82.github.io/vtschooldata/articles/enrollment_hooks_files/figure-html/chittenden-chart-1.png)
+
+---
+
 ## Enrollment Visualizations
 
 <img src="https://almartin82.github.io/vtschooldata/articles/enrollment_hooks_files/figure-html/statewide-chart-1.png" alt="Vermont statewide enrollment trends" width="600">
@@ -256,7 +368,7 @@ enr_multi = vt.fetch_enr_multi([2020, 2021, 2022, 2023, 2024])
 # Check available years
 years = vt.get_available_years()
 print(f"Data available: {years['min_year']}-{years['max_year']}")
-#> Data available: 2004-2025
+#> Data available: 2004-2024
 ```
 
 ## Data Format
@@ -279,7 +391,7 @@ print(f"Data available: {years['min_year']}-{years['max_year']}")
 
 | Years | Notes |
 |-------|-------|
-| 2004-2025 | Vermont Education Dashboard (22 years) |
+| 2004-2024 | Vermont Education Dashboard (21 years) |
 
 **Known issues:**
 - 2017-18 data has quality issues with significantly lower counts

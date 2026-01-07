@@ -468,20 +468,20 @@ process_directory <- function(raw_data, end_year) {
   # Reorder columns
   result <- result |>
     dplyr::select(
-      .data$state_school_id,
-      .data$state_district_id,
-      .data$school_name,
-      .data$district_name,
-      .data$address,
-      .data$city,
-      .data$state,
-      .data$zip,
-      .data$phone,
-      .data$principal_name,
-      .data$superintendent_name,
-      .data$latitude,
-      .data$longitude,
-      .data$end_year
+      "state_school_id",
+      "state_district_id",
+      "school_name",
+      "district_name",
+      "address",
+      "city",
+      "state",
+      "zip",
+      "phone",
+      "principal_name",
+      "superintendent_name",
+      "latitude",
+      "longitude",
+      "end_year"
     )
 
   result

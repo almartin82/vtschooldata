@@ -1,3 +1,10 @@
+### CONCURRENT TASK LIMIT
+- **Maximum 5 background tasks running simultaneously**
+- When launching multiple agents (e.g., for mass audits), batch them in groups of 5
+- Wait for the current batch to complete before launching the next batch
+
+---
+
 ## CRITICAL DATA SOURCE RULES
 
 **NEVER use Urban Institute API, NCES CCD, or ANY federal data source** — the entire point of these packages is to provide STATE-LEVEL data directly from state DOEs. Federal sources aggregate/transform data differently and lose state-specific details. If a state DOE source is broken, FIX IT or find an alternative STATE source — do not fall back to federal data.
