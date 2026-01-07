@@ -13,20 +13,18 @@ Depends:
     R (>= 4.1.0)
 Imports:
     dplyr,
-    readxl,
-    readr,
-    purrr,
-    stringr,
-    tidyr,
-    rlang,
     httr,
-    rappdirs
+    purrr,
+    rlang,
+    rappdirs,
+    readxl
 Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
     ggplot2,
-    scales
+    scales,
+    tidyr
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://almartin82.github.io/vtschooldata, https://github.com/almartin82/vtschooldata

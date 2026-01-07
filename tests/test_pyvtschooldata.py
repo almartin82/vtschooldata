@@ -7,6 +7,8 @@ These just verify the Python wrapper imports and exposes expected functions.
 
 import pytest
 
+pytest.importorskip("pyvtschooldata")
+
 
 def test_import_package():
     """Package imports successfully."""
