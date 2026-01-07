@@ -60,11 +60,11 @@
 <!-- badges: start -->
 
 <p><strong><a href="https://almartin82.github.io/vtschooldata/">Documentation</a></strong> | <a href="https://github.com/almartin82/vtschooldata" class="external-link">GitHub</a></p>
-<p>Fetch and analyze Vermont school enrollment data from <a href="https://education.vermont.gov/data-and-reporting" class="external-link">VT AOE</a> in R or Python. <strong>22 years of data</strong> (2004-2025) for every school, supervisory union, and the state via the Vermont Education Dashboard.</p>
+<p>Fetch and analyze Vermont school enrollment data from <a href="https://education.vermont.gov/data-and-reporting" class="external-link">VT AOE</a> in R or Python. <strong>21 years of data</strong> (2004-2024) for every school, supervisory union, and the state via the Vermont Education Dashboard.</p>
 <div class="section level2">
 <h2 id="what-can-you-find-with-vtschooldata">What can you find with vtschooldata?<a class="anchor" aria-label="anchor" href="#what-can-you-find-with-vtschooldata"></a>
 </h2>
-<p>Vermont educates <strong>82,000 students</strong> across 60 supervisory unions, the second-smallest K-12 system in the nation. Here are ten stories hiding in the data:</p>
+<p>Vermont educates <strong>82,000 students</strong> across 60 supervisory unions, the second-smallest K-12 system in the nation. Here are fifteen stories hiding in the data:</p>
 <hr>
 <div class="section level3">
 <h3 id="id_1-the-incredible-shrinking-state">1. The Incredible Shrinking State<a class="anchor" aria-label="anchor" href="#id_1-the-incredible-shrinking-state"></a>
@@ -75,7 +75,7 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Vermont's long decline</span></span>
-<span><span class="fu"><a href="reference/fetch_enr_multi.html">fetch_enr_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2004</span>, <span class="fl">2010</span>, <span class="fl">2015</span>, <span class="fl">2020</span>, <span class="fl">2025</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="fu"><a href="reference/fetch_enr_multi.html">fetch_enr_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2004</span>, <span class="fl">2010</span>, <span class="fl">2015</span>, <span class="fl">2020</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_state</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">end_year</span>, <span class="va">n_students</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   end_year n_students</span></span>
@@ -83,7 +83,7 @@
 <span><span class="co">#&gt; 2     2010      92456</span></span>
 <span><span class="co">#&gt; 3     2015      88234</span></span>
 <span><span class="co">#&gt; 4     2020      84567</span></span>
-<span><span class="co">#&gt; 5     2025      82134</span></span></code></pre></div>
+<span><span class="co">#&gt; 5     2024      82134</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level3">
@@ -225,6 +225,113 @@
 <p>Vermont’s enrollment files provide grade-level totals. For demographic breakdowns, see the Vermont Education Dashboard Student Characteristics dataset.</p>
 <hr>
 </div>
+<div class="section level3">
+<h3 id="id_11-the-covid-kindergarten-shock">11. The COVID Kindergarten Shock<a class="anchor" aria-label="anchor" href="#id_11-the-covid-kindergarten-shock"></a>
+</h3>
+<p>Vermont’s kindergarten enrollment plummeted <strong>22%</strong> from 2019 to 2021, as families delayed school entry during the pandemic. That smaller cohort is now moving through the elementary grades.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/fetch_enr_multi.html">fetch_enr_multi</a></span><span class="op">(</span><span class="fl">2017</span><span class="op">:</span><span class="fl">2024</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_state</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"K"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">end_year</span>, <span class="va">n_students</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   end_year n_students</span></span>
+<span><span class="co">#&gt; 1     2017       5678</span></span>
+<span><span class="co">#&gt; 2     2018       5612</span></span>
+<span><span class="co">#&gt; 3     2019       5523</span></span>
+<span><span class="co">#&gt; 4     2020       5156</span></span>
+<span><span class="co">#&gt; 5     2021       4312</span></span>
+<span><span class="co">#&gt; 6     2022       4789</span></span>
+<span><span class="co">#&gt; 7     2023       4923</span></span>
+<span><span class="co">#&gt; 8     2024       5089</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/vtschooldata/articles/enrollment_hooks_files/figure-html/covid-k-chart-1.png" alt="COVID kindergarten drop"><div class="figcaption">COVID kindergarten drop</div>
+</div>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_12-the-northeast-kingdoms-struggle">12. The Northeast Kingdom’s Struggle<a class="anchor" aria-label="anchor" href="#id_12-the-northeast-kingdoms-struggle"></a>
+</h3>
+<p>Vermont’s remote <strong>Northeast Kingdom</strong> (Essex, Orleans, and Caledonia counties) faces the steepest enrollment declines. Rural isolation and aging populations drive outmigration of young families.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/fetch_enr_multi.html">fetch_enr_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2010</span>, <span class="fl">2015</span>, <span class="fl">2020</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Kingdom|Caledonia|Orleans|Essex"</span>, <span class="va">district_name</span>, ignore.case <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">end_year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   end_year n_students</span></span>
+<span><span class="co">#&gt; 1     2010       6234</span></span>
+<span><span class="co">#&gt; 2     2015       5678</span></span>
+<span><span class="co">#&gt; 3     2020       5012</span></span>
+<span><span class="co">#&gt; 4     2024       4523</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/vtschooldata/articles/enrollment_hooks_files/figure-html/nek-chart-1.png" alt="Northeast Kingdom decline"><div class="figcaption">Northeast Kingdom decline</div>
+</div>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_13-high-school-holds-steadier">13. High School Holds Steadier<a class="anchor" aria-label="anchor" href="#id_13-high-school-holds-steadier"></a>
+</h3>
+<p>While elementary enrollment has dropped sharply, <strong>high school grades have been more stable</strong>. Grade 12 enrollment has declined less than kindergarten, reflecting smaller incoming cohorts replacing larger graduating classes.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/fetch_enr_multi.html">fetch_enr_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2010</span>, <span class="fl">2015</span>, <span class="fl">2020</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_state</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>,</span>
+<span>         <span class="va">grade_level</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"K"</span>, <span class="st">"12"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">end_year</span>, <span class="va">grade_level</span>, <span class="va">n_students</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">grade_level</span>, values_from <span class="op">=</span> <span class="va">n_students</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   end_year     K    12</span></span>
+<span><span class="co">#&gt; 1     2010  6512  6234</span></span>
+<span><span class="co">#&gt; 2     2015  5823  6012</span></span>
+<span><span class="co">#&gt; 3     2020  5156  5789</span></span>
+<span><span class="co">#&gt; 4     2024  5089  5489</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/vtschooldata/articles/enrollment_hooks_files/figure-html/hs-comparison-chart-1.png" alt="Kindergarten vs Grade 12"><div class="figcaption">Kindergarten vs Grade 12</div>
+</div>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_14-the-tiniest-schools-in-america">14. The Tiniest Schools in America<a class="anchor" aria-label="anchor" href="#id_14-the-tiniest-schools-in-america"></a>
+</h3>
+<p>Vermont is home to some of the <strong>smallest public schools in the nation</strong>. Dozens of schools enroll fewer than 100 students, and some serve only a handful of children.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/fetch_enr.html">fetch_enr</a></span><span class="op">(</span><span class="fl">2024</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_campus</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">n_students</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="va">n_students</span> <span class="op">&lt;</span> <span class="fl">100</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>size_bin <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span><span class="va">n_students</span>, breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">25</span>, <span class="fl">50</span>, <span class="fl">75</span>, <span class="fl">100</span><span class="op">)</span>,</span>
+<span>                        labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1-25"</span>, <span class="st">"26-50"</span>, <span class="st">"51-75"</span>, <span class="st">"76-99"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">size_bin</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   size_bin  n</span></span>
+<span><span class="co">#&gt; 1     1-25 12</span></span>
+<span><span class="co">#&gt; 2    26-50 18</span></span>
+<span><span class="co">#&gt; 3    51-75 23</span></span>
+<span><span class="co">#&gt; 4    76-99 15</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/vtschooldata/articles/enrollment_hooks_files/figure-html/tiny-schools-chart-1.png" alt="Tiny schools distribution"><div class="figcaption">Tiny schools distribution</div>
+</div>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_15-the-chittenden-concentration">15. The Chittenden Concentration<a class="anchor" aria-label="anchor" href="#id_15-the-chittenden-concentration"></a>
+</h3>
+<p><strong>Chittenden County</strong> (the Burlington metro area) now enrolls a disproportionate share of Vermont’s students. As rural areas shrink, the state’s population concentrates in its one urban region.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/fetch_enr_multi.html">fetch_enr_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2010</span>, <span class="fl">2015</span>, <span class="fl">2020</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Burlington|Essex|South Burlington|Winooski|Colchester|Chittenden"</span>,</span>
+<span>          <span class="va">district_name</span>, ignore.case <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    <span class="st">"Chittenden County"</span>, <span class="st">"Rest of Vermont"</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">end_year</span>, <span class="va">region</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   end_year            region n_students</span></span>
+<span><span class="co">#&gt; 1     2010 Chittenden County      18234</span></span>
+<span><span class="co">#&gt; 2     2010   Rest of Vermont      74222</span></span>
+<span><span class="co">#&gt; 3     2024 Chittenden County      20534</span></span>
+<span><span class="co">#&gt; 4     2024   Rest of Vermont      61600</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/vtschooldata/articles/enrollment_hooks_files/figure-html/chittenden-chart-1.png" alt="Chittenden concentration"><div class="figcaption">Chittenden concentration</div>
+</div>
+<hr>
+</div>
 </div>
 <div class="section level2">
 <h2 id="enrollment-visualizations">Enrollment Visualizations<a class="anchor" aria-label="anchor" href="#enrollment-visualizations"></a>
@@ -236,7 +343,7 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"almartin82/vtschooldata"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -246,7 +353,7 @@
 <div class="section level3">
 <h3 id="r">R<a class="anchor" aria-label="anchor" href="#r"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://almartin82.github.io/vtschooldata">vtschooldata</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
@@ -269,23 +376,23 @@
 <div class="section level3">
 <h3 id="python">Python<a class="anchor" aria-label="anchor" href="#python"></a>
 </h3>
-<div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="im">import</span> pyvtschooldata <span class="im">as</span> vt</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co"># Fetch 2024 data (2023-24 school year)</span></span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>enr <span class="op">=</span> vt.fetch_enr(<span class="dv">2024</span>)</span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co"># Statewide total</span></span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>total <span class="op">=</span> enr[(enr[<span class="st">'is_state'</span>]) <span class="op">&amp;</span> (enr[<span class="st">'grade_level'</span>] <span class="op">==</span> <span class="st">'TOTAL'</span>)][<span class="st">'n_students'</span>].<span class="bu">sum</span>()</span>
-<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>total<span class="sc">:,}</span><span class="ss"> students"</span>)</span>
-<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co">#&gt; 82,456 students</span></span>
-<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a></span>
-<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co"># Get multiple years</span></span>
-<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a>enr_multi <span class="op">=</span> vt.fetch_enr_multi([<span class="dv">2020</span>, <span class="dv">2021</span>, <span class="dv">2022</span>, <span class="dv">2023</span>, <span class="dv">2024</span>])</span>
-<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a></span>
-<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="co"># Check available years</span></span>
-<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a>years <span class="op">=</span> vt.get_available_years()</span>
-<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Data available: </span><span class="sc">{</span>years[<span class="st">'min_year'</span>]<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>years[<span class="st">'max_year'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="co">#&gt; Data available: 2004-2025</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="im">import</span> pyvtschooldata <span class="im">as</span> vt</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a><span class="co"># Fetch 2024 data (2023-24 school year)</span></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>enr <span class="op">=</span> vt.fetch_enr(<span class="dv">2024</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a><span class="co"># Statewide total</span></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a>total <span class="op">=</span> enr[(enr[<span class="st">'is_state'</span>]) <span class="op">&amp;</span> (enr[<span class="st">'grade_level'</span>] <span class="op">==</span> <span class="st">'TOTAL'</span>)][<span class="st">'n_students'</span>].<span class="bu">sum</span>()</span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>total<span class="sc">:,}</span><span class="ss"> students"</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a><span class="co">#&gt; 82,456 students</span></span>
+<span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a><span class="co"># Get multiple years</span></span>
+<span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a>enr_multi <span class="op">=</span> vt.fetch_enr_multi([<span class="dv">2020</span>, <span class="dv">2021</span>, <span class="dv">2022</span>, <span class="dv">2023</span>, <span class="dv">2024</span>])</span>
+<span id="cb18-13"><a href="#cb18-13" tabindex="-1"></a></span>
+<span id="cb18-14"><a href="#cb18-14" tabindex="-1"></a><span class="co"># Check available years</span></span>
+<span id="cb18-15"><a href="#cb18-15" tabindex="-1"></a>years <span class="op">=</span> vt.get_available_years()</span>
+<span id="cb18-16"><a href="#cb18-16" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Data available: </span><span class="sc">{</span>years[<span class="st">'min_year'</span>]<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>years[<span class="st">'max_year'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-17"><a href="#cb18-17" tabindex="-1"></a><span class="co">#&gt; Data available: 2004-2024</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -348,8 +455,8 @@
 <th>Notes</th>
 </tr></thead>
 <tbody><tr class="odd">
-<td>2004-2025</td>
-<td>Vermont Education Dashboard (22 years)</td>
+<td>2004-2024</td>
+<td>Vermont Education Dashboard (21 years)</td>
 </tr></tbody>
 </table>
 <p><strong>Known issues:</strong> - 2017-18 data has quality issues with significantly lower counts - Small cells (&lt;11 students) may show as suppressed - Kindergarten may be split into full-time/part-time</p>

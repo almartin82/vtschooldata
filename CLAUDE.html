@@ -39,6 +39,12 @@
     </div>
 
 
+<div class="section level3">
+<h3 id="concurrent-task-limit">CONCURRENT TASK LIMIT<a class="anchor" aria-label="anchor" href="#concurrent-task-limit"></a></h3>
+<ul><li><strong>Maximum 5 background tasks running simultaneously</strong></li>
+<li>When launching multiple agents (e.g., for mass audits), batch them in groups of 5</li>
+<li>Wait for the current batch to complete before launching the next batch</li>
+</ul><hr></div>
 <div class="section level2">
 <h2 id="critical-data-source-rules">CRITICAL DATA SOURCE RULES<a class="anchor" aria-label="anchor" href="#critical-data-source-rules"></a></h2>
 <p><strong>NEVER use Urban Institute API, NCES CCD, or ANY federal data source</strong> — the entire point of these packages is to provide STATE-LEVEL data directly from state DOEs. Federal sources aggregate/transform data differently and lose state-specific details. If a state DOE source is broken, FIX IT or find an alternative STATE source — do not fall back to federal data.</p>

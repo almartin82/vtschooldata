@@ -22,6 +22,17 @@ Transform data into analysis-ready formats
 - [`enr_grade_aggs()`](https://almartin82.github.io/vtschooldata/reference/enr_grade_aggs.md)
   : Custom Enrollment Grade Level Aggregates
 
+## School Directory
+
+Fetch school directory information
+
+- [`fetch_directory()`](https://almartin82.github.io/vtschooldata/reference/fetch_directory.md)
+  : Fetch Vermont school directory data
+- [`get_available_directory_years()`](https://almartin82.github.io/vtschooldata/reference/get_available_directory_years.md)
+  : Get available years of Vermont directory data
+- [`clear_directory_cache()`](https://almartin82.github.io/vtschooldata/reference/clear_directory_cache.md)
+  : Clear school directory cache
+
 ## Cache Management
 
 Manage locally cached data
