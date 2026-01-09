@@ -145,16 +145,17 @@ fetch_enr(2024) |>
 
 ```r
 fetch_enr_multi(c(2010, 2024)) |>
-  filter(is_district, grepl("Kingdom|Caledonia|Orleans", district_name),
+  filter(is_campus, grepl("Kingdom|Caledonia|Orleans", district_name),
          subgroup == "total_enrollment", grade_level == "TOTAL") |>
-  select(end_year, district_name, n_students)
-#>   end_year           district_name n_students
-#> 1     2010 Caledonia Central SU         1245
-#> 2     2010      Kingdom East SU         1823
-#> 3     2010     Orleans Central SU         1456
-#> 4     2024 Caledonia Central SU         1012
-#> 5     2024      Kingdom East SU         1189
-#> 6     2024     Orleans Central SU         1134
+  group_by(end_year, district_name) |>
+  summarize(n_students = sum(n_students))
+#>   end_year                       district_name n_students
+#> 1     2010        CALEDONIA CENTRAL SUPERVISORY UNION       1445
+#> 2     2010         KINGDOM EAST SUPERVISORY DISTRICT       1892
+#> 3     2010        ORLEANS CENTRAL SUPERVISORY UNION       1458
+#> 4     2024        CALEDONIA CENTRAL SUPERVISORY UNION       1242
+#> 5     2024         KINGDOM EAST SUPERVISORY DISTRICT       1232
+#> 6     2024        ORLEANS CENTRAL SUPERVISORY UNION       1033
 ```
 
 ---
