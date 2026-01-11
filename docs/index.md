@@ -18,8 +18,8 @@ hiding in the data:
 
 ### 1. The Incredible Shrinking State
 
-Vermont has lost **18% of its students** since 2004. No other state has
-declined faster. The 2004 count: 99,978. Today: 82,000.
+Vermont has lost **14% of its students** since 2004. No other state has
+declined faster. The 2004 count: 92,334. Today: 79,288.
 
 ``` r
 library(vtschooldata)
@@ -30,11 +30,11 @@ fetch_enr_multi(c(2004, 2010, 2015, 2020, 2024)) |>
   filter(is_state, subgroup == "total_enrollment", grade_level == "TOTAL") |>
   select(end_year, n_students)
 #>   end_year n_students
-#> 1     2004      99978
-#> 2     2010      92456
-#> 3     2015      88234
-#> 4     2020      84567
-#> 5     2024      82134
+#> 1     2004      92334
+#> 2     2010      84535
+#> 3     2015      79519
+#> 4     2020      83503
+#> 5     2024      79288
 ```
 
 ------------------------------------------------------------------------
@@ -46,13 +46,17 @@ While Vermont shrinks, **Burlington School District** has actually grown
 
 ``` r
 fetch_enr_multi(2015:2024) |>
-  filter(is_district, grepl("Burlington", district_name),
+  filter(is_campus, grepl("Burlington", district_name),
          subgroup == "total_enrollment", grade_level == "TOTAL") |>
-  select(end_year, district_name, n_students)
+  group_by(end_year, district_name) |>
+  summarize(n_students = sum(n_students))
 #>   end_year              district_name n_students
-#> 1     2015 Burlington School District       3845
-#> 2     2020 Burlington School District       3956
-#> 3     2024 Burlington School District       4142
+#> 1     2015        BURLINGTON SUPERVISORY DISTRICT       3652
+#> 2     2015 SOUTH BURLINGTON SUPERVISORY DISTRICT       2697
+#> 3     2020        BURLINGTON SUPERVISORY DISTRICT       3582
+#> 4     2020 SOUTH BURLINGTON SUPERVISORY DISTRICT       2756
+#> 5     2024        BURLINGTON SUPERVISORY DISTRICT       3506
+#> 6     2024 SOUTH BURLINGTON SUPERVISORY DISTRICT       2693
 ```
 
 ------------------------------------------------------------------------
@@ -69,11 +73,17 @@ fetch_enr(2024) |>
   arrange(n_students) |>
   select(campus_name, district_name, n_students) |>
   head(10)
-#>              campus_name          district_name n_students
-#> 1   Ripton Elementary Sc    Addison Central SU         28
-#> 2  Wardsboro Elementary      West River MUED          32
-#> 3   Athens Elem School      Windham Southeast         34
-#> ...
+#>                   campus_name                        district_name n_students
+#> 1                Elmore School     LAMOILLE SOUTH SUPERVISORY UNION         12
+#> 2       Jamaica Village School    WINDHAM CENTRAL SUPERVISORY UNION         17
+#> 3    WINDHAM ELEMENTARY SCHOOL    WINDHAM CENTRAL SUPERVISORY UNION         17
+#> 4       WOODFORD HOLLOW SCHOOL  SOUTHWEST VERMONT SUPERVISORY UNION         28
+#> 5    READING ELEMENTARY SCHOOL     MOUNTAIN VIEWS SUPERVISORY UNION         32
+#> 6        Lakeview Union School  ORLEANS SOUTHWEST SUPERVISORY UNION         34
+#> 7     Ripton Elementary School ADDISON CENTRAL SUPERVISORY DISTRICT         37
+#> 8   Stockbridge Central School WHITE RIVER VALLEY SUPERVISORY UNION         37
+#> 9    Grafton Elementary School  WINDHAM NORTHEAST SUPERVISORY UNION         38
+#> 10 READSBORO ELEMENTARY SCHOOL  WINDHAM SOUTHWEST SUPERVISORY UNION         40
 ```
 
 ------------------------------------------------------------------------
@@ -89,12 +99,12 @@ fetch_enr_multi(2019:2024) |>
   filter(is_state, subgroup == "total_enrollment", grade_level == "K") |>
   select(end_year, n_students)
 #>   end_year n_students
-#> 1     2019       5823
-#> 2     2020       5456
-#> 3     2021       4534
-#> 4     2022       5012
-#> 5     2023       5134
-#> 6     2024       5089
+#> 1     2019       5826
+#> 2     2020       5879
+#> 3     2021       5157
+#> 4     2022       5699
+#> 5     2023       5404
+#> 6     2024       5191
 ```
 
 ------------------------------------------------------------------------
@@ -108,14 +118,14 @@ overhead in a shrinking system.
 ``` r
 # Count supervisory unions over time
 fetch_enr_multi(c(2010, 2015, 2020, 2024)) |>
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  filter(is_campus, subgroup == "total_enrollment", grade_level == "TOTAL") |>
   group_by(end_year) |>
-  summarize(n_districts = n())
+  summarize(n_districts = n_distinct(district_id))
 #>   end_year n_districts
-#> 1     2010          72
-#> 2     2015          68
-#> 3     2020          62
-#> 4     2024          58
+#> 1     2010          60
+#> 2     2015          59
+#> 3     2020           1
+#> 4     2024          52
 ```
 
 ------------------------------------------------------------------------
@@ -127,11 +137,11 @@ students, up from 20% in 2000.
 
 ``` r
 fetch_enr(2024) |>
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  filter(is_campus, subgroup == "total_enrollment", grade_level == "TOTAL") |>
   filter(grepl("Chittenden|Burlington|Essex|South Burlington|Winooski|Colchester", district_name)) |>
   summarize(chittenden_total = sum(n_students))
 #>   chittenden_total
-#> 1            20534
+#> 1            13249
 ```
 
 ------------------------------------------------------------------------
@@ -143,16 +153,17 @@ the steepest declines. Kingdom East has lost 35% of students since 2010.
 
 ``` r
 fetch_enr_multi(c(2010, 2024)) |>
-  filter(is_district, grepl("Kingdom|Caledonia|Orleans", district_name),
+  filter(is_campus, grepl("Kingdom|Caledonia|Orleans", district_name),
          subgroup == "total_enrollment", grade_level == "TOTAL") |>
-  select(end_year, district_name, n_students)
-#>   end_year           district_name n_students
-#> 1     2010 Caledonia Central SU         1245
-#> 2     2010      Kingdom East SU         1823
-#> 3     2010     Orleans Central SU         1456
-#> 4     2024 Caledonia Central SU         1012
-#> 5     2024      Kingdom East SU         1189
-#> 6     2024     Orleans Central SU         1134
+  group_by(end_year, district_name) |>
+  summarize(n_students = sum(n_students))
+#>   end_year                       district_name n_students
+#> 1     2010        CALEDONIA CENTRAL SUPERVISORY UNION       1445
+#> 2     2010         KINGDOM EAST SUPERVISORY DISTRICT       1892
+#> 3     2010        ORLEANS CENTRAL SUPERVISORY UNION       1458
+#> 4     2024        CALEDONIA CENTRAL SUPERVISORY UNION       1242
+#> 5     2024         KINGDOM EAST SUPERVISORY DISTRICT       1232
+#> 6     2024        ORLEANS CENTRAL SUPERVISORY UNION       1033
 ```
 
 ------------------------------------------------------------------------
@@ -169,7 +180,7 @@ fetch_enr(2024) |>
   filter(is_state, subgroup == "total_enrollment", grade_level == "K") |>
   select(n_students)
 #>   n_students
-#> 1       5089
+#> 1       5191
 ```
 
 ------------------------------------------------------------------------
@@ -187,8 +198,8 @@ fetch_enr_multi(c(2010, 2024)) |>
   select(end_year, grade_level, n_students) |>
   tidyr::pivot_wider(names_from = end_year, values_from = n_students)
 #>   grade_level `2010` `2024`
-#> 1          K   6512   5089
-#> 2         12   6234   5489
+#> 1          K   6205   5191
+#> 2         12   6683   4823
 ```
 
 ------------------------------------------------------------------------
@@ -224,14 +235,14 @@ fetch_enr_multi(2017:2024) |>
   filter(is_state, subgroup == "total_enrollment", grade_level == "K") |>
   select(end_year, n_students)
 #>   end_year n_students
-#> 1     2017       5678
-#> 2     2018       5612
-#> 3     2019       5523
-#> 4     2020       5156
-#> 5     2021       4312
-#> 6     2022       4789
-#> 7     2023       4923
-#> 8     2024       5089
+#> 1     2017       5786
+#> 2     2018       5975
+#> 3     2019       5826
+#> 4     2020       5879
+#> 5     2021       5157
+#> 6     2022       5699
+#> 7     2023       5404
+#> 8     2024       5191
 ```
 
 ![COVID kindergarten
@@ -249,15 +260,15 @@ aging populations drive outmigration of young families.
 
 ``` r
 fetch_enr_multi(c(2010, 2015, 2020, 2024)) |>
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  filter(is_campus, subgroup == "total_enrollment", grade_level == "TOTAL") |>
   filter(grepl("Kingdom|Caledonia|Orleans|Essex", district_name, ignore.case = TRUE)) |>
   group_by(end_year) |>
   summarize(n_students = sum(n_students))
 #>   end_year n_students
-#> 1     2010       6234
-#> 2     2015       5678
-#> 3     2020       5012
-#> 4     2024       4523
+#> 1     2010       6432
+#> 2     2015       5967
+#> 3     2020       5523
+#> 4     2024       5041
 ```
 
 ![Northeast Kingdom
@@ -281,10 +292,10 @@ fetch_enr_multi(c(2010, 2015, 2020, 2024)) |>
   select(end_year, grade_level, n_students) |>
   tidyr::pivot_wider(names_from = grade_level, values_from = n_students)
 #>   end_year     K    12
-#> 1     2010  6512  6234
-#> 2     2015  5823  6012
-#> 3     2020  5156  5789
-#> 4     2024  5089  5489
+#> 1     2010  6205  6683
+#> 2     2015  5763  5727
+#> 3     2020  5879  5088
+#> 4     2024  5191  4823
 ```
 
 ![Kindergarten vs Grade
@@ -308,10 +319,10 @@ fetch_enr(2024) |>
                         labels = c("1-25", "26-50", "51-75", "76-99"))) |>
   count(size_bin)
 #>   size_bin  n
-#> 1     1-25 12
-#> 2    26-50 18
-#> 3    51-75 23
-#> 4    76-99 15
+#> 1     1-25  3
+#> 2    26-50 10
+#> 3    51-75 21
+#> 4    76-99 25
 ```
 
 ![Tiny schools
@@ -329,7 +340,7 @@ state’s population concentrates in its one urban region.
 
 ``` r
 fetch_enr_multi(c(2010, 2015, 2020, 2024)) |>
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  filter(is_campus, subgroup == "total_enrollment", grade_level == "TOTAL") |>
   mutate(region = if_else(
     grepl("Burlington|Essex|South Burlington|Winooski|Colchester|Chittenden",
           district_name, ignore.case = TRUE),
@@ -338,10 +349,10 @@ fetch_enr_multi(c(2010, 2015, 2020, 2024)) |>
   group_by(end_year, region) |>
   summarize(n_students = sum(n_students))
 #>   end_year            region n_students
-#> 1     2010 Chittenden County      18234
-#> 2     2010   Rest of Vermont      74222
-#> 3     2024 Chittenden County      20534
-#> 4     2024   Rest of Vermont      61600
+#> 1     2010 Chittenden County      18934
+#> 2     2010   Rest of Vermont      65601
+#> 3     2024 Chittenden County      20256
+#> 4     2024   Rest of Vermont      59032
 ```
 
 ![Chittenden

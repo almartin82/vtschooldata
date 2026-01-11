@@ -19,7 +19,7 @@ Vermont educates **82,000 students** across 60 supervisory unions, the second-sm
 
 ### 1. The Incredible Shrinking State
 
-Vermont has lost **18% of its students** since 2004. No other state has declined faster. The 2004 count: 99,978. Today: 82,000.
+Vermont has lost **14% of its students** since 2004. No other state has declined faster. The 2004 count: 92,334. Today: 79,288.
 
 ```r
 library(vtschooldata)
